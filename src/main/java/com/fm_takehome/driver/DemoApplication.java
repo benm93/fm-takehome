@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fm_takehome.model.RouteWrapper;
+import com.fm_takehome.model.StopWrapper;
 
 @SpringBootApplication
 @RestController
@@ -36,25 +37,29 @@ public class DemoApplication {
 	
 	@GetMapping("/fetch")
 	public String hello() throws URISyntaxException, IOException, InterruptedException {
-		// create a client
+		//create a client
+		HttpClient hc = HttpClient.newBuilder().build();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		//get routes		
 		HttpRequest request = HttpRequest.newBuilder()
 			.uri(new URI("https://api-v3.mbta.com/routes"))
 			.GET()
 			.build();
 		
-		HttpClient hc = HttpClient.newBuilder().build();
+		HttpResponse<String> routesResponse = hc.send(request, HttpResponse.BodyHandlers.ofString());		
+		String routesBody = (String)routesResponse.body();
+		RouteWrapper rw = objectMapper.readValue(routesBody, RouteWrapper.class);
 		
-		BodySubscriber<String> bs = BodySubscribers.ofString(Charset.defaultCharset());
+		//get stops
+		HttpRequest stopsRequest = HttpRequest.newBuilder()
+				.uri(new URI("https://api-v3.mbta.com/stops"))
+				.GET()
+				.build();
 		
-		HttpResponse<String> response = hc.send(request, HttpResponse.BodyHandlers.ofString());
-		
-		String body = (String)response.body();
-		
-		ObjectMapper objectMapper = new ObjectMapper();
-		
-		RouteWrapper rw = objectMapper.readValue(body, RouteWrapper.class);
-		
-		response.toString();
+		HttpResponse<String> stopsResponse = hc.send(stopsRequest, HttpResponse.BodyHandlers.ofString());		
+		String stopsBody = (String)stopsResponse.body();		
+		StopWrapper sw = objectMapper.readValue(stopsBody, StopWrapper.class);
 		
 		return "MBTA fetch endpoint!";
 	}
