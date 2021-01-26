@@ -1,7 +1,13 @@
-package com.fm_takehome.model;
+package com.fm_takehome.models;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StopAttributes {
 	public String getAddress() {
@@ -46,6 +52,11 @@ public class StopAttributes {
 	public void setWheelchair_boarding(Integer wheelchair_boarding) {
 		this.wheelchair_boarding = wheelchair_boarding;
 	}
+	
+	@Id
+    @GeneratedValue
+    private Long id;
+	
 	String address;
 	String at_street;
 	String description;

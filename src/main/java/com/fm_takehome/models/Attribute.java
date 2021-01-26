@@ -1,4 +1,4 @@
-package com.fm_takehome.model;
+package com.fm_takehome.models;
 
 import java.util.List;
 

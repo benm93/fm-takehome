@@ -1,4 +1,4 @@
-package com.fm_takehome.model;
+package com.fm_takehome.models;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,7 +9,7 @@ public class StopWrapper {
 		data = d;
 	}
 	
-	List<Stop> getData(List<Stop> d) {
+	public List<Stop> getData() {
 		return data;
 	}
 	

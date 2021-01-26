@@ -10,6 +10,9 @@
 
 subway is route type 1
 
+http://localhost:8080/h2-console
+see logs to get jdbc connection string
+
 how do i figure out how many stops are on a given route?
 `curl -X GET "https://api-v3.mbta.com/stops?filter%5Broute%5D=751" -H "accept: application/vnd.api+json"`
 
