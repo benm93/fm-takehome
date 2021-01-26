@@ -11,7 +11,7 @@ public class RouteWrapper {
 		data = d;
 	}
 	
-	List<Route> getData(List<Route> d) {
+	public List<Route> getData() {
 		return data;
 	}
 	

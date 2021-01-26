@@ -38,7 +38,10 @@ import com.fm_takehome.models.RouteWrapper;
 import com.fm_takehome.models.StopAttributes;
 import com.fm_takehome.models.StopWrapper;
 import com.fm_takehome.repositories.StopAttributeRepository;
+import com.fm_takehome.services.AttributeService;
+import com.fm_takehome.services.RouteService;
 import com.fm_takehome.services.StopAttributesService;
+import com.fm_takehome.services.StopService;
 
 @SpringBootApplication
 @RestController
@@ -50,6 +53,15 @@ public class DemoApplication {
 	
 	@Autowired
     private StopAttributesService saService;
+	
+	@Autowired
+    private StopService stopService;
+	
+	@Autowired
+    private RouteService routeService;
+	
+	@Autowired
+    private AttributeService attributeService;
 	
 	@GetMapping("/hello")
 	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
@@ -73,6 +85,8 @@ public class DemoApplication {
 		String routesBody = (String)routesResponse.body();
 		RouteWrapper rw = objectMapper.readValue(routesBody, RouteWrapper.class);
 		
+		routeService.Save(rw.getData());
+		
 		//get stops
 		HttpRequest stopsRequest = HttpRequest.newBuilder()
 				.uri(new URI("https://api-v3.mbta.com/stops"))
@@ -84,8 +98,11 @@ public class DemoApplication {
 		StopWrapper sw = objectMapper.readValue(stopsBody, StopWrapper.class);
 		
 		List<StopAttributes> sa = new ArrayList<StopAttributes>();
-		sw.getData().forEach(stop -> sa.add(stop.getAttributes()));
-		saService.Save(sa);
+		
+		stopService.Save(sw.getData());
+		
+		//sw.getData().forEach(stop -> sa.add(stop.getAttributes()));
+		//saService.Save(sa);
 		
 //		String url = "jdbc:sqlite:C:/sqlite/db/" + "mbta.db";
 //

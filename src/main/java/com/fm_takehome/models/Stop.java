@@ -3,6 +3,7 @@ package com.fm_takehome.models;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -12,6 +13,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Stop {
+	
+	@Id
+    @GeneratedValue
+    private Long stopId;
+	
 	public StopAttributes getAttributes() {
 		return attributes;
 	}
@@ -35,8 +41,7 @@ public class Stop {
     //@JoinColumn(name="loan", referencedColumnName="loan_id")
 	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	StopAttributes attributes;
-	
-	@Id
+
 	String id;
 	
 	String type;

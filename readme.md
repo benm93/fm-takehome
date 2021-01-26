@@ -1,7 +1,7 @@
 # To Do:
 - [X] Pull Route Data from API
 - [X] Pull Stop data from API
-- [ ] Persist Data to DB
+- [X] Persist Data to DB
 - [ ] Query DB to Answer questions
 - [ ] Optimize
 - [ ] Testing and Documentation

@@ -2,7 +2,24 @@ package com.fm_takehome.models;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Route {
+	
+	@Id
+    @GeneratedValue
+    private Long routeId;
+	
+	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	Attribute attributes;	
 	
 	public Attribute getAttributes() {
@@ -36,7 +53,12 @@ public class Route {
 		this.type = type;
 	}
 	String id;
+	
+	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	Self links;
+	
+	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+	
 	Relationship relationships;
 	String type;
 }

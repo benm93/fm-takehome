@@ -1,6 +1,16 @@
 package com.fm_takehome.models;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class Data {
+	
+	@Id
+    @GeneratedValue
+    private Long dataId;
+	
 	String id;
 	public String getId() {
 		return id;
