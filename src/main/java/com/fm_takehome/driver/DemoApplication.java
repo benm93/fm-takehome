@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fm_takehome.models.Route;
 import com.fm_takehome.models.RouteWrapper;
+import com.fm_takehome.models.Stop;
 import com.fm_takehome.models.StopAttributes;
 import com.fm_takehome.models.StopWrapper;
 import com.fm_takehome.repositories.StopAttributeRepository;
@@ -82,6 +83,24 @@ public class DemoApplication {
 			Integer type = route.getAttributes().getType();
 			String longName = route.getAttributes().getLong_name();
 			if (type == 0 || type == 1) names.add(longName);
+		});		
+		
+		return names;
+	}
+	
+	@GetMapping("/getSubwayStopsByMunicipality")
+	public List<String> getSubwayStopsByMunicipality(@RequestParam("town") String town) throws URISyntaxException, IOException, InterruptedException {
+		
+		//load up routes from entity
+		List<Stop> stops = stopService.list();
+		
+		//total up number of routes where type is 0 or 1 using EF style syntax
+		List<String> names = new ArrayList<String>();
+		
+		stops.forEach(stop -> {
+			String municipality = stop.getAttributes().getMunicipality();
+			String name = stop.getAttributes().getName();
+			if (municipality.equals(town)) names.add(name);
 		});		
 		
 		return names;

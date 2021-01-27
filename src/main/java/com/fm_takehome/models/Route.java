@@ -61,4 +61,5 @@ public class Route {
 	
 	Relationship relationships;
 	String type;
+	//Integer stopCount
 }
