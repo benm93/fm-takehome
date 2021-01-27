@@ -106,6 +106,42 @@ public class DemoApplication {
 		return names;
 	}
 	
+	@GetMapping("/getSubwayRouteFewestStops")
+	public String getSubwayRouteFewestStops() throws URISyntaxException, IOException, InterruptedException {
+		
+		Integer min = Integer.MAX_VALUE;
+		String name = "";
+		
+		List<Route> routes = routeService.list();
+		
+		for (Route route : routes) {
+			List<Stop> stops = route.getStops();
+			if (stops.size() < min) {
+				min = stops.size();
+				name = route.getAttributes().getLong_name();
+			}
+		}
+		
+		return name + " has " + min + " stops.";
+	}
+	
+	@GetMapping("/getSubwayRouteMostStops")
+	public String getSubwayRouteMostStops() throws URISyntaxException, IOException, InterruptedException {
+		Integer max = Integer.MIN_VALUE;
+		String name = "";
+		
+		List<Route> routes = routeService.list();
+		
+		for (Route route : routes) {
+			if (route.getStops().size() > max) {
+				max = route.getStops().size();
+				name = route.getAttributes().getLong_name();
+			}
+		}
+		
+		return name + " has " + max + " stops.";
+	}
+	
 	@GetMapping("/fetch")
 	public String hello() throws URISyntaxException, IOException, InterruptedException {
 		
@@ -115,7 +151,7 @@ public class DemoApplication {
 		
 		//get routes
 		HttpRequest request = HttpRequest.newBuilder()
-			.uri(new URI("https://api-v3.mbta.com/routes"))
+			.uri(new URI("https://api-v3.mbta.com/routes?filter%5Btype%5D=0%2C1"))
 			.GET()
 			.build();
 		
@@ -123,21 +159,46 @@ public class DemoApplication {
 		String routesBody = (String)routesResponse.body();
 		RouteWrapper rw = objectMapper.readValue(routesBody, RouteWrapper.class);
 		
+		
+		//query the stops for each routes
+		List<Route> routes = rw.getData();		
+		for (Route route : routes) {
+			StringBuilder routeList = new StringBuilder();
+			routeList.append("https://api-v3.mbta.com/stops?include=route&filter%5Broute%5D=");	
+			routeList.append(route.getId());
+			HttpRequest stopsRequest = HttpRequest.newBuilder()
+					.uri(new URI(routeList.toString()))
+					.GET()
+					.build();
+			HttpResponse<String> stopsResponse = hc.send(stopsRequest, HttpResponse.BodyHandlers.ofString());		
+			String stopsBody = (String)stopsResponse.body();
+			StopWrapper sw = objectMapper.readValue(stopsBody, StopWrapper.class);
+			//update stop list in model
+			route.setStops(sw.getData());
+		}
+		
+		//save model - should also populate stop table
 		routeService.Save(rw.getData());
 		
-		//get stops
-		HttpRequest stopsRequest = HttpRequest.newBuilder()
-				.uri(new URI("https://api-v3.mbta.com/stops"))
-				.GET()
-				.build();
+		//add the list of stops to the existing route model in a many:many relationship
+		//this should take the place of the existing stops query
 		
-		HttpResponse<String> stopsResponse = hc.send(stopsRequest, HttpResponse.BodyHandlers.ofString());		
-		String stopsBody = (String)stopsResponse.body();		
-		StopWrapper sw = objectMapper.readValue(stopsBody, StopWrapper.class);
 		
-		List<StopAttributes> sa = new ArrayList<StopAttributes>();
 		
-		stopService.Save(sw.getData());
+//		HttpResponse<String> stopsResponse = hc.send(stopsRequest, HttpResponse.BodyHandlers.ofString());		
+//		String stopsBody = (String)stopsResponse.body();		
+//		
+		
+		//List<StopAttributes> sa = new ArrayList<StopAttributes>();
+		
+		//stopService.Save(sw.getData());
+		
+		
+		
+		
+		
+		//https://api-v3.mbta.com/stops?include=route&filter%5Broute%5D=Red to query stops by route name
+		
 		
 		//sw.getData().forEach(stop -> sa.add(stop.getAttributes()));
 		//saService.Save(sa);

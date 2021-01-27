@@ -3,10 +3,12 @@ package com.fm_takehome.models;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -62,4 +64,16 @@ public class Route {
 	Relationship relationships;
 	String type;
 	//Integer stopCount
+	
+	//@OneToMany(mappedBy="route",cascade = {CascadeType.ALL})
+	//fetch = FetchType.LAZY
+	@OneToMany(cascade = {CascadeType.ALL},fetch = FetchType.EAGER)
+	List<Stop> stops;
+
+	public List<Stop> getStops() {
+		return stops;
+	}
+	public void setStops(List<Stop> stops) {
+		this.stops = stops;
+	}
 }
