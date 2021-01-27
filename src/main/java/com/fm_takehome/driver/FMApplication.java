@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -64,6 +66,45 @@ public class FMApplication {
 	
 	@Autowired
     private AttributeService attributeService;
+	
+    @PostConstruct
+    public void loadData() throws URISyntaxException, IOException, InterruptedException {
+    	
+		//create a client
+		HttpClient hc = HttpClient.newBuilder().build();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		//get routes
+		HttpRequest request = HttpRequest.newBuilder()
+			.uri(new URI("https://api-v3.mbta.com/routes?filter%5Btype%5D=0%2C1"))
+			.GET()
+			.build();
+		
+		HttpResponse<String> routesResponse = hc.send(request, HttpResponse.BodyHandlers.ofString());		
+		String routesBody = (String)routesResponse.body();
+		RouteWrapper rw = objectMapper.readValue(routesBody, RouteWrapper.class);
+		
+		
+		//query the stops for each routes
+		List<Route> routes = rw.getData();		
+		for (Route route : routes) {
+			StringBuilder routeList = new StringBuilder();
+			routeList.append("https://api-v3.mbta.com/stops?include=route&filter%5Broute%5D=");	
+			routeList.append(route.getId());
+			HttpRequest stopsRequest = HttpRequest.newBuilder()
+					.uri(new URI(routeList.toString()))
+					.GET()
+					.build();
+			HttpResponse<String> stopsResponse = hc.send(stopsRequest, HttpResponse.BodyHandlers.ofString());		
+			String stopsBody = (String)stopsResponse.body();
+			StopWrapper sw = objectMapper.readValue(stopsBody, StopWrapper.class);
+			//update stop list in model
+			route.setStops(sw.getData());
+		}
+		
+		//save model - should also populate stop table
+		routeService.Save(rw.getData());
+    }
 	
 	@GetMapping("/getSubwayRoutes")
 	public List<String> getSubwayRoutes() throws URISyntaxException, IOException, InterruptedException {
@@ -135,47 +176,6 @@ public class FMApplication {
 		}
 		
 		return name + " has " + max + " stops.";
-	}
-	
-	@GetMapping("/fetch")
-	public String hello() throws URISyntaxException, IOException, InterruptedException {
-		
-		//create a client
-		HttpClient hc = HttpClient.newBuilder().build();
-		ObjectMapper objectMapper = new ObjectMapper();
-		
-		//get routes
-		HttpRequest request = HttpRequest.newBuilder()
-			.uri(new URI("https://api-v3.mbta.com/routes?filter%5Btype%5D=0%2C1"))
-			.GET()
-			.build();
-		
-		HttpResponse<String> routesResponse = hc.send(request, HttpResponse.BodyHandlers.ofString());		
-		String routesBody = (String)routesResponse.body();
-		RouteWrapper rw = objectMapper.readValue(routesBody, RouteWrapper.class);
-		
-		
-		//query the stops for each routes
-		List<Route> routes = rw.getData();		
-		for (Route route : routes) {
-			StringBuilder routeList = new StringBuilder();
-			routeList.append("https://api-v3.mbta.com/stops?include=route&filter%5Broute%5D=");	
-			routeList.append(route.getId());
-			HttpRequest stopsRequest = HttpRequest.newBuilder()
-					.uri(new URI(routeList.toString()))
-					.GET()
-					.build();
-			HttpResponse<String> stopsResponse = hc.send(stopsRequest, HttpResponse.BodyHandlers.ofString());		
-			String stopsBody = (String)stopsResponse.body();
-			StopWrapper sw = objectMapper.readValue(stopsBody, StopWrapper.class);
-			//update stop list in model
-			route.setStops(sw.getData());
-		}
-		
-		//save model - should also populate stop table
-		routeService.Save(rw.getData());
-		
-		return "Mbta Data Loaded";
 	}
 	
 	public static void main(String[] args) {
