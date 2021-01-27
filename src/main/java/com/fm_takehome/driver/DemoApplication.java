@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fm_takehome.models.Route;
 import com.fm_takehome.models.RouteWrapper;
 import com.fm_takehome.models.StopAttributes;
 import com.fm_takehome.models.StopWrapper;
@@ -68,6 +69,24 @@ public class DemoApplication {
 	return String.format("Hello %s!", name);
 	}
 	
+	@GetMapping("/getSubwayRoutes")
+	public List<String> getSubwayRoutes() throws URISyntaxException, IOException, InterruptedException {
+		
+		//load up routes from entity
+		List<Route> routes = routeService.list();
+		
+		//total up number of routes where type is 0 or 1 using EF style syntax
+		List<String> names = new ArrayList<String>();
+		
+		routes.forEach(route -> {
+			Integer type = route.getAttributes().getType();
+			String longName = route.getAttributes().getLong_name();
+			if (type == 0 || type == 1) names.add(longName);
+		});		
+		
+		return names;
+	}
+	
 	@GetMapping("/fetch")
 	public String hello() throws URISyntaxException, IOException, InterruptedException {
 		
@@ -75,7 +94,7 @@ public class DemoApplication {
 		HttpClient hc = HttpClient.newBuilder().build();
 		ObjectMapper objectMapper = new ObjectMapper();
 		
-		//get routes		
+		//get routes
 		HttpRequest request = HttpRequest.newBuilder()
 			.uri(new URI("https://api-v3.mbta.com/routes"))
 			.GET()
