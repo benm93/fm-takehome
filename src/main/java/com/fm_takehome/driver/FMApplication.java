@@ -51,7 +51,7 @@ import com.fm_takehome.services.StopService;
 @EntityScan(basePackages = {"com.fm_takehome.models"})  // scan JPA entities
 @EnableJpaRepositories("com.fm_takehome.repositories")
 @ComponentScan({"com.fm_takehome.services"})
-public class DemoApplication {
+public class FMApplication {
 	
 	@Autowired
     private StopAttributesService saService;
@@ -64,11 +64,6 @@ public class DemoApplication {
 	
 	@Autowired
     private AttributeService attributeService;
-	
-	@GetMapping("/hello")
-	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-	return String.format("Hello %s!", name);
-	}
 	
 	@GetMapping("/getSubwayRoutes")
 	public List<String> getSubwayRoutes() throws URISyntaxException, IOException, InterruptedException {
@@ -180,47 +175,11 @@ public class DemoApplication {
 		//save model - should also populate stop table
 		routeService.Save(rw.getData());
 		
-		//add the list of stops to the existing route model in a many:many relationship
-		//this should take the place of the existing stops query
-		
-		
-		
-//		HttpResponse<String> stopsResponse = hc.send(stopsRequest, HttpResponse.BodyHandlers.ofString());		
-//		String stopsBody = (String)stopsResponse.body();		
-//		
-		
-		//List<StopAttributes> sa = new ArrayList<StopAttributes>();
-		
-		//stopService.Save(sw.getData());
-		
-		
-		
-		
-		
-		//https://api-v3.mbta.com/stops?include=route&filter%5Broute%5D=Red to query stops by route name
-		
-		
-		//sw.getData().forEach(stop -> sa.add(stop.getAttributes()));
-		//saService.Save(sa);
-		
-//		String url = "jdbc:sqlite:C:/sqlite/db/" + "mbta.db";
-//
-//        try (Connection conn = DriverManager.getConnection(url)) {
-//            if (conn != null) {
-//                DatabaseMetaData meta = conn.getMetaData();
-//                System.out.println("The driver name is " + meta.getDriverName());
-//                System.out.println("A new database has been created.");
-//            }
-//
-//        } catch (SQLException e) {
-//            System.out.println(e.getMessage());
-//        }
-		
-		return "MBTA fetch endpoint!";
+		return "Mbta Data Loaded";
 	}
 	
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(FMApplication.class, args);
 	}
 
 }

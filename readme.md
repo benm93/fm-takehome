@@ -1,9 +1,10 @@
 # To Do:
+
 - [X] Pull Route Data from API
 - [X] Pull Stop data from API
 - [X] Persist Data to DB
 - [X] Query DB to Answer questions
-- [ ] Add some tests
+- [ ] Add more tests
 - [ ] Optimize and Refactor
 - [X] Documentation
 
@@ -12,7 +13,7 @@
 Navigate to http://localhost:8080/h2-console to browse database.
 The jdbc connection string is printed to the console during startup.
 
-# Documentation
+# Documentation:
 
 After starting the application, call the /fetch endpoint to load MBTA data into the local DB.
 
